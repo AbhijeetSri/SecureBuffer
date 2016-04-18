@@ -1,6 +1,6 @@
 #define _GNU_SOURCE
 //mymalloc.c
-// gcc -shared -fPIC -o mymalloc.so mymalloc.c
+// gcc -shared -fPIC -o mymalloc.so mymalloc.c -ldl
 
 #include <stdlib.h>
 #include <dlfcn.h>
@@ -65,7 +65,7 @@ void *malloc(size_t size){
 	// add caller and size to global array
 	if(!first_time)
 	{
-		insert_global(&caller, (int) size);
+		insert_global(caller, (int) size);
 	}
 	first_time = 0;	
 	if(debug)
@@ -112,8 +112,8 @@ char *strcpy(char *d, const char *s){
 	if(!f_ptr)
 		f_ptr = (char *(*)()) dlsym(RTLD_NEXT, "strcpy");
 
-	dest_size = search_global(&d);
-	printf("%s %x\n", "Address: ",&d);
+	dest_size = search_global(d);
+	printf("%s %x\n", "Address: ",d);
 	if (dest_size <0) 
 	{	
 		printf("%s\n", "Destination not allocated on heap" );

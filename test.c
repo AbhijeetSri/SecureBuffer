@@ -8,10 +8,18 @@
 //void print_globals();
 int main()
 {
-	char * s = "Hello string1";
-	char *d = malloc(sizeof(char)*14);
+	char * s = "Hello string12356";
+	char * d = malloc(sizeof(char)*14);
+	printf("%s %x\n"," destination address: ", d);
 	char *res = strcpy(d,s);
-	printf("%s\n", res);
+	if(res == NULL) 
+		{
+			printf("%s\n", "value returned NULL" );
+		}
+		else{
+		printf("%s\n", res);		
+		}
+	
 
 	printf("Hello World ! %s", "Abhijeet\n");
 
