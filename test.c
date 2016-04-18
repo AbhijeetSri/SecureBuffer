@@ -1,4 +1,6 @@
-//#include "test.h"
+/*
+*	command to run LD_PRELOAD=./mymalloc.so a.out
+*/
 #include <stdlib.h>
 #include <stdio.h>
 //#include <mymalloc.c>
