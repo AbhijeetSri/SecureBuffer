@@ -21,6 +21,13 @@ void __attribute__ ((constructor)) setup(void){
 
 void print_globals();
 void resize();
+void insert_global (int , int );
+void *malloc(size_t );
+ int search_global(int);
+void print_globals();
+char *strcpy(char *dest, const char * source);
+char *strcat(char *dest, const char *src);
+//char *strcpy(char *d, char s[]){ return strcpy(d, (char *)s);}
 
 void insert_global (int pointer, int size)
 {
@@ -55,7 +62,6 @@ void resize()
 	printf("%s %d\n", "Current SIZE: ", cur_size);
 }
 
-
 void *malloc(size_t size){
 	static void * (*f_ptr)(size_t);
 	if(!f_ptr)
@@ -75,7 +81,6 @@ void *malloc(size_t size){
 	}
 	return (caller);
 }
-
 
 void print_globals()
 {
@@ -102,9 +107,12 @@ int search_global(int pos)
 }
 
 
-
 char *strcpy(char *d, const char *s){
+	
+	printf("%s\n", "In our strcpy." );
 	static char* (*f_ptr)(char * d, const char* s);
+	//static char* (*strncp_ptr)(char * d, const char * s, size_t size);
+
 	int dest_size = 0;
 	int source_size = 0;
 	char * sp = s;
@@ -112,7 +120,7 @@ char *strcpy(char *d, const char *s){
 	if(!f_ptr)
 		f_ptr = (char *(*)()) dlsym(RTLD_NEXT, "strcpy");
 
-	dest_size = search_global(d);
+	dest_size = search_global((int)d);
 	printf("%s %x\n", "Address: ",d);
 	if (dest_size <0) 
 	{	
@@ -125,13 +133,57 @@ char *strcpy(char *d, const char *s){
 		source_size++;
 		sp++;
 	}
-	if(!(source_size <= dest_size -1))
+	if(source_size > dest_size -1)
 	{
-		printf("%s\n", "Invalid buffer size" );
-		return NULL;
+		printf("%s\n", "Destination size less.. copying only the allocated chars");
+		char * res = strncpy(d, s, (size_t) dest_size);
+		res[dest_size - 1] = '\0';
+		return res;
 	}
 
 	printf("%s\n","Test strcpy" );
 	char* res = f_ptr(d, s);
 	return res;
 }
+
+/*
+* 	appends the string pointed to by src to the end of the string pointed to by dest.
+*/
+char *strcat(char *dest, const char *src){
+
+printf("%s\n", "In function strcat");
+	static char* (*f_ptr)(char * d, const char* s);
+	if(!f_ptr)
+		f_ptr = (char *(*)()) dlsym(RTLD_NEXT, "strcat");
+	
+	int dest_size = search_global(dest);
+	int ss = 0;
+	int ds = 0;
+	char * res = NULL;
+	char * it = src;
+	
+	while (* it++ != '\0') ss++;
+
+	it = dest;
+	while(* it++ != '\0') ds++;
+
+	printf("%s %d %s %d %s %d \n","Source: ",ss, " Destination Size: ", dest_size, "dest: ",ds );
+
+	if ( (ss + ds +1) > dest_size )
+	{
+		// handle the exception
+		res = strncat(dest, src, (size_t) (dest_size - ds -1));
+		res[dest_size - 1] = '\0';
+
+	}
+	else
+	{
+		res = f_ptr(dest, src);
+
+	}
+
+	return res;
+
+}
+
+
