@@ -1,9 +1,10 @@
 #define _GNU_SOURCE
 //mymalloc.c
-// gcc -shared -fPIC -o mymalloc.so mymalloc.c -ldl
+// gcc -w -shared -fPIC -o mymalloc.so mymalloc.c -ldl
 
 #include <stdlib.h>
 #include <dlfcn.h>
+#include <stdio.h>
 
 #define debug 0
 #define ROW 20000
@@ -27,6 +28,9 @@ void *malloc(size_t );
 void print_globals();
 char *strcpy(char *dest, const char * source);
 char *strcat(char *dest, const char *src);
+char *gets(char *buf);
+
+
 //char *strcpy(char *d, char s[]){ return strcpy(d, (char *)s);}
 
 void insert_global (int pointer, int size)
@@ -149,7 +153,8 @@ char *strcpy(char *d, const char *s){
 /*
 * 	appends the string pointed to by src to the end of the string pointed to by dest.
 */
-char *strcat(char *dest, const char *src){
+char *strcat(char *dest, const char *src)
+{
 
 printf("%s\n", "In function strcat");
 	static char* (*f_ptr)(char * d, const char* s);
@@ -186,4 +191,32 @@ printf("%s\n", "In function strcat");
 
 }
 
+char *gets(char *buf)
+{
+	int buf_size = search_global(buf);
+	register int c;
+	register char *s;
+	int input_size = 0;
 
+	for (s = buf; (c = getchar()) != '\n'; input_size++)
+	{
+		if (input_size > buf_size - 1)
+		{
+			s[buf_size] = '\0';
+			break;
+		}
+		if (c == EOF)
+		{
+			if (s == buf)
+			{	return (NULL);}
+			else
+			{break;}
+		}
+		else
+		{
+			*s++ = c;
+		}
+	}
+	*s = 0;
+	return (buf);
+}
