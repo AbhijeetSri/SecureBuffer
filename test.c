@@ -12,18 +12,27 @@ int main()
 	char * d = malloc(sizeof(char)*15);
 	printf("%s %x\n"," destination address: ", d);
 	
+// TEST CASE  : gets
+
+	char * gets_ex = malloc(sizeof(char) * 10);
+	printf("%s\n", " type a string: " );
+	gets(gets_ex);
+	printf("%s \n", gets_ex);
+
+
+
 
 // TEST CASE : strcpy
-	/*
-	char *res = strcpy(d,s);
-	if(res == NULL) 
-	{
-		printf("%s\n", "value returned NULL" );
-	}
-	else{
-		printf("%s\n", res);		
-	}
-	*/
+	
+	// char *res = strcpy(d,s);
+	// if(res == NULL) 
+	// {
+	// 	printf("%s\n", "value returned NULL" );
+	// }
+	// else{
+	// 	printf("%s\n", res);		
+	// }
+	
 
 // TEST CASE: malloc
 /*
@@ -43,12 +52,14 @@ int main()
 
 // TEST CASE : strcat
 
-char dest[]= "test";
-d = strcpy(d, dest);
-printf("%s \n" ,d);
-char * dest2 = " longer long longer longest";
-d = strcat(d , dest2);
-printf("%s\n", d);
+// char * dest= "test";
+// d = strcpy(d, dest);
+// printf("%s \n" ,d);
+// char * dest2 = " longer long longer longest";
+// d = strcat(d , dest2);
+// printf("%s\n", d);
+
+
 
 
 

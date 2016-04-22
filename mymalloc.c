@@ -35,7 +35,7 @@ char *gets(char *buf);
 
 void insert_global (int pointer, int size)
 {
-	//printf("%s %d %s %d \n", "current pos: ", cur_position, "current size: ", cur_size);
+	printf("%s %d %s %d %s %x \n", "current pos: ", cur_position, "current size: ", cur_size, " Pointer ", pointer);
 	if (cur_position >= cur_size)
 	{
 		first_time = 1;
@@ -43,9 +43,9 @@ void insert_global (int pointer, int size)
 	}
 	*(global_array + cur_position * 2) = pointer;
 	*(global_array + cur_position * 2 + 1) = size;
-//	global_array[cur_position][0] = pointer;
-//	global_array[cur_position][1] = size;
 	cur_position++;
+	printf("%s\n", "Test after insert global" );
+
 }
 
 void resize()
@@ -124,7 +124,7 @@ char *strcpy(char *d, const char *s){
 	if(!f_ptr)
 		f_ptr = (char *(*)()) dlsym(RTLD_NEXT, "strcpy");
 
-	dest_size = search_global((int)d);
+	dest_size = search_global(d);
 	printf("%s %x\n", "Address: ",d);
 	if (dest_size <0) 
 	{	
@@ -198,13 +198,13 @@ char *gets(char *buf)
 	register char *s;
 	int input_size = 0;
 
-	for (s = buf; (c = getchar()) != '\n'; input_size++)
+	for (s = buf; (c = getchar()) != '\n' && (input_size < buf_size-1); input_size++)
 	{
-		if (input_size > buf_size - 1)
-		{
-			s[buf_size] = '\0';
-			break;
-		}
+		// if (input_size > buf_size-1)
+		// {
+		// 	s[buf_size -1 ] = '\0';
+		// 	break;
+		// }
 		if (c == EOF)
 		{
 			if (s == buf)
