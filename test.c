@@ -59,7 +59,7 @@ int main()
 // d = strcat(d , dest2);
 // printf("%s\n", d);
 
-
+free(d);
 
 
 

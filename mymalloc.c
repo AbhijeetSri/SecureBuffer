@@ -29,13 +29,15 @@ void print_globals();
 char *strcpy(char *dest, const char * source);
 char *strcat(char *dest, const char *src);
 char *gets(char *buf);
+void free(void *ptr);
+int return_index_global(int);
 
 
 //char *strcpy(char *d, char s[]){ return strcpy(d, (char *)s);}
 
 void insert_global (int pointer, int size)
 {
-	printf("%s %d %s %d %s %x \n", "current pos: ", cur_position, "current size: ", cur_size, " Pointer ", pointer);
+	//printf("%s %d %s %d %s %x \n", "current pos: ", cur_position, "current size: ", cur_size, " Pointer ", pointer);
 	if (cur_position >= cur_size)
 	{
 		first_time = 1;
@@ -44,7 +46,7 @@ void insert_global (int pointer, int size)
 	*(global_array + cur_position * 2) = pointer;
 	*(global_array + cur_position * 2 + 1) = size;
 	cur_position++;
-	printf("%s\n", "Test after insert global" );
+	//printf("%s\n", "Test after insert global" );
 
 }
 
@@ -108,6 +110,60 @@ int search_global(int pos)
 		}
 	}
 	return -1;
+}
+
+// return the index , used for freeing the array
+int return_index_global(int pos)
+{
+	int i = 0;
+	for (i = 0; i< cur_position; i++)
+	{
+		//if (global_array[i][0] == pos)
+		if(*(global_array + 2*i) == pos)
+		{
+			return i;
+		}
+	}
+	return -1;
+}
+
+
+
+void free(void *ptr)
+{
+	// remove from global_array
+	// decrement cur_position
+	static void (*f_ptr)(void *);
+	if(!f_ptr)
+		f_ptr = (void (*)()) dlsym(RTLD_NEXT, "free");
+
+
+	int pos_in_array = 0;
+	int i = 0;
+	int temp = 0;
+	pos_in_array = return_index_global((int)ptr);
+
+	if (pos_in_array <= 0 ) {
+		printf("FREE: Pointer not allocated in heap\n");
+		return f_ptr;
+	}
+	else
+	{
+		for(i = pos_in_array; i < cur_position-1; i++)
+		{
+
+			*(global_array + i * 2) = *(global_array + (i+1) * 2);
+			*(global_array + ((i*2) + 1)) = *(global_array + ((i+1) * 2 + 1));
+		}
+		// for safety: overwriting last value
+		*(global_array + cur_position *2) = 0;
+		*(global_array + cur_position *2 +1) = 0;
+		
+		cur_position --;
+		printf("%s %x\n","FREE: freeing ", ptr );
+		return f_ptr;
+	}
+
 }
 
 
