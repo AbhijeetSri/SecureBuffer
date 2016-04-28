@@ -101,12 +101,18 @@ void print_globals()
 int search_global(int pos)
 {
 	int i = 0;
+	int diff = 0;
+
 	for (i = 0; i< cur_position; i++)
 	{
 		//if (global_array[i][0] == pos)
 		if(*(global_array + 2*i) == pos)
 		{
 			return *(global_array + 2*i +1);
+		}else if(*(global_array + 2*i) < pos && pos < *(global_array + 2*i)+ *(global_array + 2*i +1)){
+			// Calculate difference between actual size and pointer size.
+			diff = *(global_array + 2*i +1) - (pos - *(global_array + 2*i));
+			return diff;		
 		}
 	}
 	return -1;
@@ -141,7 +147,8 @@ void free(void *ptr)
 	int pos_in_array = 0;
 	int i = 0;
 	int temp = 0;
-	pos_in_array = return_index_global((int)ptr);
+	printf("Free Pointer: %x", ptr);
+	pos_in_array = search_global(ptr);
 
 	if (pos_in_array <= 0 ) {
 		printf("FREE: Pointer not allocated in heap\n");
