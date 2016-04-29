@@ -192,7 +192,8 @@ char *strcpy(char *d, const char *s){
 	if (dest_size <0) 
 	{	
 		printf("%s\n", "Destination not allocated on heap" );
-		return NULL;
+		char* res = f_ptr(d, s);
+		return res;
 	}
 
 	while(*sp != '\0')
@@ -225,6 +226,12 @@ printf("%s\n", "In function strcat");
 		f_ptr = (char *(*)()) dlsym(RTLD_NEXT, "strcat");
 	
 	int dest_size = search_global(dest);
+	if( dest_size < 0){
+		printf("%s\n", "Destination not allocated on heap" );
+		//Call default function
+		char* res = f_ptr(dest, src);
+		return res;	
+	}
 	int ss = 0;
 	int ds = 0;
 	char * res = NULL;
