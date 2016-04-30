@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Securebuffer : software security">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Securebuffer</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/AbhijeetSri/SecureBuffer">View on GitHub</a>
+
+          <h1 id="project_title">Securebuffer</h1>
+          <h2 id="project_tagline">software security</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/AbhijeetSri/SecureBuffer/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/AbhijeetSri/SecureBuffer/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a id="securebuffer" class="anchor" href="#securebuffer" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>SecureBuffer</h1>
+
+<h1>
+<a id="filename" class="anchor" href="#filename" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>FileName:</h1>
+
+<p><br> SecureBuffer.c 
+<br> test.c</p>
+
+<h1>
+<a id="description" class="anchor" href="#description" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Description:</h1>
+
+<p><code>SecureBuffer.c</code> contains source code for various functions secured from buffer overflow attacks.
+Functions included:</p>
+
+<ul>
+<li>malloc <br> keeps track of size of memory allocated</li>
+<li>gets  <br>   Does not let the input get past the set buffer size</li>
+<li>strcpy <br>      Does not let the input string copied past destination size - sets last character as '\0'</li>
+<li>strcat <br>      Does not let the resultant string go past Buffer Size, also terminates with '\0' </li>
+<li>free  <br>     Deallocates the memory</li>
+</ul>
+
+<p>File <code>test.c</code> includes functions to test the library</p>
+
+<h1>
+<a id="how-to-use" class="anchor" href="#how-to-use" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>How to Use?</h1>
+
+<p>Using gcc, simply compile SecureBuffer.c to .so file using below command <br>
+ <code>$ gcc -w -shared -fPIC -o SecureBuffer.so SecureBuffer.c -ldl</code></p>
+
+<p>Compile your program using gcc as usual. 
+<br>
+<code>$ gcc normal.c</code>
+<br>
+To Use the library in any program, use LD_PRELOAD construct <br>
+<code>$ LD_PRELOAD=./SecureBuffer.so ./&lt;YOUR PROGRAM&gt;</code></p>
+
+<p>LD_PRELOAD is used to load a shared library before loading any other librray. Interestig info about LD_PRELOAD can be found <a href="http://stackoverflow.com/questions/426230/what-is-the-ld-preload-trick">here</a>.</p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Securebuffer maintained by <a href="https://github.com/AbhijeetSri">AbhijeetSri</a></p>
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
