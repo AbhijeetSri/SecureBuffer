@@ -20,5 +20,5 @@ Using gcc, simply compile SecureBuffer.c to .so file using below command <br/>
 To Use the library in any program, use LD_PRELOAD construct <br/>
 `` $ LD_PRELOAD=./SecureBuffer.so ./<YOUR PROGRAM> ``
 
-LD_PRELOAD is used to load a shared library before loading any other librray. Interestig info about LD_PRELOAD can be found [here]. (http://stackoverflow.com/questions/426230/what-is-the-ld-preload-trick)
+LD_PRELOAD is used to load a shared library before loading any other librray. Interestig info about LD_PRELOAD can be found [here] (http://stackoverflow.com/questions/426230/what-is-the-ld-preload-trick).
 
