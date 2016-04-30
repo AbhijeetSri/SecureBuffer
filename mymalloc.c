@@ -119,7 +119,7 @@ int search_global(int pos)
 }
 
 // return the index , used for freeing the array
-int return_index_global(int pos)
+int get_index(int pos)
 {
 	int i = 0;
 	for (i = 0; i< cur_position; i++)
@@ -148,9 +148,9 @@ void free(void *ptr)
 	int i = 0;
 	int temp = 0;
 	printf("Free Pointer: %x", ptr);
-	pos_in_array = search_global(ptr);
+	pos_in_array = get_index(ptr);
 
-	if (pos_in_array <= 0 ) {
+	if (pos_in_array < 0 ) {
 		printf("FREE: Pointer not allocated in heap\n");
 		return f_ptr;
 	}
