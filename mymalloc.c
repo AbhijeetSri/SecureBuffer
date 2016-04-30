@@ -15,8 +15,12 @@ static int cur_position = 0;
 static int cur_size = ROW;
 static int first_time = 1;
 
+
+/*
+* Initialize the global memmry for the very first time
+*/
 void __attribute__ ((constructor)) setup(void){
-	printf("%s\n", "in the constructor" );
+	if (debug) printf("%s\n", "in the constructor" );
 	global_array = (int*) malloc(cur_size * 2 * sizeof(int));
 }
 
@@ -43,6 +47,8 @@ void insert_global (int pointer, int size)
 		first_time = 1;
 		resize();
 	}
+	
+	// using single dimensional array for 2D arrays
 	*(global_array + cur_position * 2) = pointer;
 	*(global_array + cur_position * 2 + 1) = size;
 	cur_position++;
@@ -53,11 +59,12 @@ void insert_global (int pointer, int size)
 void resize()
 {
 	//int new_array[2*cur_size][2]; // = new int[2*cur_size][2];
-	printf("%s\n","resizing" );
+	if(debug) printf("%s\n","resizing" );
 	int* new_array = (int*) malloc(cur_size * 2 * 2 * sizeof(int)); // size double * 2 col/row
 	int i =0;
 	for(i = 0 ; i < cur_size; i++)
 	{
+		
 		*(new_array + i*2) = *(global_array + i*2);
 		*(new_array + i*2 + 1) = *(global_array + i*2 +1);
 		//new_array[i][0] = global_array[i][0];
@@ -65,21 +72,29 @@ void resize()
 	}
 	global_array = new_array;
 	cur_size = cur_size * 2;
-	printf("%s %d\n", "Current SIZE: ", cur_size);
+	if(debug) printf("%s %d\n", "Current SIZE: ", cur_size);
 }
 
+/*
+* Overriding malloc
+*/
 void *malloc(size_t size){
+	
 	static void * (*f_ptr)(size_t);
+	// point the function pointer to original "mallooc"
 	if(!f_ptr)
 		f_ptr = (void *(*)()) dlsym(RTLD_NEXT, "malloc");
+	
 	//printf("%s %d\n", " size to malloc: ", size );
 	void* caller = f_ptr(size);
+
 	// add caller and size to global array
-	if(!first_time)
+	if(!first_time)  // avoid when called for first time from constructor
 	{
 		insert_global(caller, (int) size);
 	}
 	first_time = 0;	
+
 	if(debug)
 	{
 		cur_position % 1000 == 0 ? cur_position %= 1000 : cur_position;
@@ -88,6 +103,10 @@ void *malloc(size_t size){
 	return (caller);
 }
 
+
+/*
+* Utility function for printing global array contents
+*/
 void print_globals()
 {
 	int i =0;
@@ -98,6 +117,10 @@ void print_globals()
 	}
 }
 
+
+/*
+* Function which searched in the Global array for memory map
+*/
 int search_global(int pos)
 {
 	int i = 0;
@@ -118,7 +141,7 @@ int search_global(int pos)
 	return -1;
 }
 
-// return the index , used for freeing the array
+// return the index, used for freeing the array
 int get_index(int pos)
 {
 	int i = 0;
@@ -147,27 +170,28 @@ void free(void *ptr)
 	int pos_in_array = 0;
 	int i = 0;
 	int temp = 0;
-	printf("Free Pointer: %x", ptr);
+	if(debug) printf("Free Pointer: %x", ptr);
 	pos_in_array = get_index(ptr);
 
+
 	if (pos_in_array < 0 ) {
-		printf("FREE: Pointer not allocated in heap\n");
+		if(debug) printf("FREE: Pointer not allocated in heap\n");
 		return f_ptr;
 	}
 	else
-	{
+	{	// Shift the global array up
 		for(i = pos_in_array; i < cur_position-1; i++)
 		{
 
 			*(global_array + i * 2) = *(global_array + (i+1) * 2);
 			*(global_array + ((i*2) + 1)) = *(global_array + ((i+1) * 2 + 1));
 		}
-		// for safety: overwriting last value
+		// for safety: overwriting last index
 		*(global_array + cur_position *2) = 0;
 		*(global_array + cur_position *2 +1) = 0;
 		
 		cur_position --;
-		printf("%s %x\n","FREE: freeing ", ptr );
+		if(debug) printf("%s %x\n","FREE: freeing ", ptr );
 		return f_ptr;
 	}
 
@@ -176,7 +200,7 @@ void free(void *ptr)
 
 char *strcpy(char *d, const char *s){
 	
-	printf("%s\n", "In our strcpy." );
+	if (debug) printf("%s\n", "In our strcpy." );
 	static char* (*f_ptr)(char * d, const char* s);
 	//static char* (*strncp_ptr)(char * d, const char * s, size_t size);
 
@@ -191,7 +215,7 @@ char *strcpy(char *d, const char *s){
 	printf("%s %x\n", "Address: ",d);
 	if (dest_size <0) 
 	{	
-		printf("%s\n", "Destination not allocated on heap" );
+		if (debug) printf("%s\n", "Destination not allocated on heap" );
 		char* res = f_ptr(d, s);
 		return res;
 	}
@@ -203,13 +227,13 @@ char *strcpy(char *d, const char *s){
 	}
 	if(source_size > dest_size -1)
 	{
-		printf("%s\n", "Destination size less.. copying only the allocated chars");
+		if(debug ) printf("%s\n", "Destination size less.. copying only the allocated chars");
 		char * res = strncpy(d, s, (size_t) dest_size);
 		res[dest_size - 1] = '\0';
 		return res;
 	}
 
-	printf("%s\n","Test strcpy" );
+	if (debug) printf("%s\n","Test strcpy" );
 	char* res = f_ptr(d, s);
 	return res;
 }
@@ -220,20 +244,20 @@ char *strcpy(char *d, const char *s){
 char *strcat(char *dest, const char *src)
 {
 
-printf("%s\n", "In function strcat");
+	if (debug) printf("%s\n", "In function strcat");
 	static char* (*f_ptr)(char * d, const char* s);
 	if(!f_ptr)
 		f_ptr = (char *(*)()) dlsym(RTLD_NEXT, "strcat");
 	
 	int dest_size = search_global(dest);
 	if( dest_size < 0){
-		printf("%s\n", "Destination not allocated on heap" );
+		if (debug) printf("%s\n", "Destination not allocated on heap" );
 		//Call default function
 		char* res = f_ptr(dest, src);
 		return res;	
 	}
-	int ss = 0;
-	int ds = 0;
+	int ss = 0; // source size
+	int ds = 0;	// dest size
 	char * res = NULL;
 	char * it = src;
 	
@@ -242,7 +266,7 @@ printf("%s\n", "In function strcat");
 	it = dest;
 	while(* it++ != '\0') ds++;
 
-	printf("%s %d %s %d %s %d \n","Source: ",ss, " Destination Size: ", dest_size, "dest: ",ds );
+	if(debug) printf("%s %d %s %d %s %d \n","Source: ",ss, " Destination Size: ", dest_size, "dest: ",ds );
 
 	if ( (ss + ds +1) > dest_size )
 	{
@@ -270,11 +294,6 @@ char *gets(char *buf)
 
 	for (s = buf; (c = getchar()) != '\n' && (input_size < buf_size-1); input_size++)
 	{
-		// if (input_size > buf_size-1)
-		// {
-		// 	s[buf_size -1 ] = '\0';
-		// 	break;
-		// }
 		if (c == EOF)
 		{
 			if (s == buf)
